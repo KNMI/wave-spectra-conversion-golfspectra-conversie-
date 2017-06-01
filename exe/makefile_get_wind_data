@@ -1,0 +1,13 @@
+#
+# 
+# laatst gewijzigd : 13-03-2006
+#
+# let op: TAB's gebruiken bij cc regels !!!
+#
+
+
+get_wind_data.exe: get_wind_data.o 
+	cc -o get_wind_data.exe get_wind_data.o -lm /usr/local/free/lib/librtwndbac.a
+
+get_wind_data.o: get_wind_data.c
+	cc -c -W -I/usr/local/free/include/rtwndb get_wind_data.c 

@@ -1,0 +1,21 @@
+#
+# 
+# laatst gewijzigd : 13-03-2006
+#
+# let op: TAB's gebruiken bij cc regels !!!
+#
+
+spectra.exe: spectra_main.o spectra_sovf80_input.o spectra_sovf81_input.o spectra_sovf82_input.o
+	cc -o spectra.exe spectra_main.o spectra_sovf80_input.o spectra_sovf81_input.o spectra_sovf82_input.o /usr/lib/libm.a
+
+spectra_main.o: spectra_main.c
+	cc -c -W spectra_main.c
+
+spectra_sovf80_input.o: spectra_sovf80_input.c
+	cc -c -W spectra_sovf80_input.c	
+
+spectra_sovf81_input.o: spectra_sovf81_input.c
+	cc -c -W spectra_sovf81_input.c
+
+spectra_sovf82_input.o: spectra_sovf82_input.c
+	cc -c -W spectra_sovf82_input.c	
