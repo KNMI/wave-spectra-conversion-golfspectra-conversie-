@@ -1,10 +1,16 @@
 #!/bin/csh
 
+
 #set PRESENTDATE = '/usr/knmi/bin/extdate'
 #set BACKUPDATE = '/usr/knmi/bin/backupdate'
 
-set PRESENTDATE = '/d/appl/linux/knmi/bin/extdate'
-set BACKUPDATE = '/d/appl/linux/knmi/bin/backupdate'
+#set PRESENTDATE = '/d/appl/linux/knmi/bin/extdate'
+#set BACKUPDATE = '/d/appl/linux/knmi/bin/backupdate'
+
+#set PRESENTDATE = '/usr/local/free/bin/extdate'
+#set BACKUPDATE = '/usr/local/free/bin/backupdate'
+set PRESENTDATE = '/usr/people/stam/bin/extdate'
+set BACKUPDATE = '/usr/people/stam/bin/backupdate'
 
 
 
@@ -36,11 +42,16 @@ set BACKUPDATE = '/d/appl/linux/knmi/bin/backupdate'
 #########################################################################
 
 # input dir waar de golven bulletins vandaan moeten komen (golf bulletin bv: MSS_R276123330_595_SOVF82_EHDB_031200)
-setenv ENV_SPECTRA_KNMI /net/bsspop-rtw/rtwndb/data/NSBD
+#setenv ENV_SPECTRA_KNMI /net/bsspop-rtw/rtwndb/data/NSBD
+#setenv ENV_SPECTRA_KNMI /bsspop-rtw/rtwndb/data/NSBD
+#setenv ENV_SPECTRA_KNMI /data/bsspop-rtw/rtwndb/data/NSBD
+setenv ENV_SPECTRA_KNMI /data/rtwndb/data/NSBD
 
 # voor RTWNDB (wind data)
-setenv GVWRNDATA /net/bsspop-rtw/rtwndb/data/WNDB
-
+#setenv GVWRNDATA /net/bsspop-rtw/rtwndb/data/WNDB
+#setenv GVWRNDATA /bsspop-rtw/rtwndb/data/WNDB
+#setenv GVWRNDATA /data/bsspop-rtw/rtwndb/data/WNDB
+setenv GVWRNDATA /data/rtwndb/data/WNDB
 
 # spectra home dir waar het volgende geinstalleerd moet zijn:
 #
@@ -60,25 +71,29 @@ setenv GVWRNDATA /net/bsspop-rtw/rtwndb/data/WNDB
 # - eventueel file: makefile_get_wind_data
 # - eventueel file: makefile_spectra
 #
-setenv ENV_SPECTRA_LOCAL /nobackup/users/stam/SPECTRA
+# - eventueel copy.sc   (aangeroepen via crontab; copy van output files voor Frits Koek)
+# - eventueel remove.sc (aangeroepen via crontab; 1x per dag verwijderen files ouder dan 7 dagen uit input_backup, output_cds etc..., maar niet uit input_sovf80, input_sovf81 en sovf82, dit gebeurt in dit script uurlijks)
+
+
+setenv ENV_SPECTRA_LOCAL /usr/people/stam/SPECTRA
 
 # output dir's voor diverse aangemaakte files
-setenv ENV_SPECTRA_CIC /nobackup/users/stam/SPECTRA/output_cic/
-setenv ENV_SPECTRA_CDS /nobackup/users/stam/SPECTRA/output_cds/
-setenv ENV_SPECTRA_CID /nobackup/users/stam/SPECTRA/output_cid/
-setenv ENV_SPECTRA_DSP /nobackup/users/stam/SPECTRA/output_dsp/
-setenv ENV_SPECTRA_LDS /nobackup/users/stam/SPECTRA/output_lds/
-setenv ENV_SPECTRA_LFD /nobackup/users/stam/SPECTRA/output_lfd/
-setenv ENV_SPECTRA_LFR /nobackup/users/stam/SPECTRA/output_lfr/
+setenv ENV_SPECTRA_CIC /usr/people/stam/SPECTRA/output_cic/
+setenv ENV_SPECTRA_CDS /usr/people/stam/SPECTRA/output_cds/
+setenv ENV_SPECTRA_CID /usr/people/stam/SPECTRA/output_cid/
+setenv ENV_SPECTRA_DSP /usr/people/stam/SPECTRA/output_dsp/
+setenv ENV_SPECTRA_LDS /usr/people/stam/SPECTRA/output_lds/
+setenv ENV_SPECTRA_LFD /usr/people/stam/SPECTRA/output_lfd/
+setenv ENV_SPECTRA_LFR /usr/people/stam/SPECTRA/output_lfr/
 
 # log dir + filenaam
-setenv ENV_SPECTRA_LOG /nobackup/users/stam/SPECTRA/log/log.txt
+setenv ENV_SPECTRA_LOG /usr/people/stam/SPECTRA/log/log.txt
 
 # wind dir
-setenv ENV_SPECTRA_WIND /nobackup/users/stam/SPECTRA/input_wind/
+setenv ENV_SPECTRA_WIND /usr/people/stam/SPECTRA/input_wind/
 
 # dir waar file (suspect.txt) met verdachte stations staat */
-setenv ENV_SPECTRA_SUSPECT /nobackup/users/stam/SPECTRA/suspect/
+setenv ENV_SPECTRA_SUSPECT /usr/people/stam/SPECTRA/suspect/
 #
 # - file: suspect.txt (niet leeg)
 
@@ -113,8 +128,9 @@ if (-e $PRESENTDATE && $#argv == 1) then
       set dtgw = `echo $dtgw|awk '{printf "%.10s",$0}'`
 
       cd $ENV_SPECTRA_LOCAL
-      get_wind_data.exe $dtgw
-
+      #get_wind_data.exe $dtgw
+      #/usr/people/stam/SPECTRA/get_wind_data.exe $dtgw
+      $ENV_SPECTRA_LOCAL/get_wind_data.exe $dtgw
 
       #
       # verwijderen van 7 dagen oude files
@@ -153,7 +169,7 @@ if (-e $PRESENTDATE && $#argv == 1) then
       #
       # input files kopieeren naar spectra input dirs.
       # in input_sovf80 etc. worden de files weer vrij snel verwijderd (om bij inlezen verwarring met oudere files te voorkomen 
-      # daarom nog een backup in de input_backup dir (worden nooit verwijderd in principe)
+      # daarom nog een backup in de input_backup dir (worden verwijderd via remove.sc, via crontab)
       #
       cd $ENV_SPECTRA_LOCAL/input_sovf80
       cp $ENV_SPECTRA_KNMI/MSS_*_*_SOVF80_EHDB_$dtgw0"00" $ENV_SPECTRA_LOCAL/input_sovf80
@@ -177,29 +193,15 @@ if (-e $PRESENTDATE && $#argv == 1) then
    
 
       cd $ENV_SPECTRA_LOCAL
-      spectra.exe $dtgw1 SOVF80
-      spectra.exe $dtgw1 SOVF81
-      spectra.exe $dtgw1 SOVF82
-
-
-      #
-      # verwijderen van 7 dagen oude files
-      # 
-      #set dtgw7 = `$BACKUPDATE $dtg -168`
-      #set dtgw7 = `echo $dtgw7|awk '{printf substr($0, 7, 4)}'`
-      #
-      #verwijderen uit input directory
-      #cd $ENV_SPECTRA_LOCAL/input_sovf80
-      #rm -f MSS_*_*_SOVF80_EHDB_$dtgw7"00"
-      #
-      #cd $ENV_SPECTRA_LOCAL/input_sovf81
-      #rm -f MSS_*_*_SOVF81_EHDB_$dtgw7"00"
-      # 
-      #cd $ENV_SPECTRA_LOCAL/input_sovf82
-      #rm -f MSS_*_*_SOVF82_EHDB_$dtgw7"00"
-      # 
-      #verwijderen aangemaakte files (.CID, .LDS etc.)
-      # ???????????????/
+      #spectra.exe $dtgw1 SOVF80
+      #spectra.exe $dtgw1 SOVF81
+      #spectra.exe $dtgw1 SOVF82
+      $ENV_SPECTRA_LOCAL/spectra.exe $dtgw1 SOVF80
+      $ENV_SPECTRA_LOCAL/spectra.exe $dtgw1 SOVF81
+      $ENV_SPECTRA_LOCAL/spectra.exe $dtgw1 SOVF82
+      #/usr/people/stam/SPECTRA/spectra.exe $dtgw1 SOVF80
+      #/usr/people/stam/SPECTRA/spectra.exe $dtgw1 SOVF81
+      #/usr/people/stam/SPECTRA/spectra.exe $dtgw1 SOVF82
 
 
    endif
@@ -253,9 +255,12 @@ if (-e $PRESENTDATE && $#argv == 1) then
          #
 
          cd $ENV_SPECTRA_LOCAL
-         spectra.exe $dtgw1b SOVF80
-         spectra.exe $dtgw1b SOVF81
-         spectra.exe $dtgw1b SOVF82
+         #spectra.exe $dtgw1b SOVF80
+         #spectra.exe $dtgw1b SOVF81
+         #spectra.exe $dtgw1b SOVF82
+         $ENV_SPECTRA_LOCAL/spectra.exe $dtgw1b SOVF80
+         $ENV_SPECTRA_LOCAL/spectra.exe $dtgw1b SOVF81
+         $ENV_SPECTRA_LOCAL/spectra.exe $dtgw1b SOVF82
 
 
       endif
@@ -278,10 +283,7 @@ if (-e $PRESENTDATE && $#argv == 1) then
       rm -f MSS_*
 
       #verwijderen aangemaakte files (.CID, .LDS etc.)
-   
-
-      # ???????????????/
-
+      #zie remove.sc (files verwijderen uit alle output dir's en uit input_backup)
 
 
    endif
