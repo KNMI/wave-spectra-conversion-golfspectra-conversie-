@@ -2,7 +2,7 @@
 #define spectra_h
 
 /* hier moet staan WINDOWS of UNIX */
-#define WINDOWS
+#define UNIX
 
 
 /* betreffende input files arrays */
@@ -119,7 +119,7 @@
 #define A122_FF_FACTOR                                        1.00          /* 15-03-2010: gokje, nog verder uitzoekn */
 #define BG2b_FF_FACTOR                                        1.00          /* 15-03-2010: gokje, nog verder uitzoekn */
 
-/* waterdiepten (meters) (zie ook gps.h) */
+/* waterdiepten (meters) */
 #define NC1_DIEPTE                                            161.0
 #define NC2_DIEPTE                                            161.0
 #define ANA1_DIEPTE                                           86.0

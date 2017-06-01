@@ -623,7 +623,6 @@ int Check_Alternatieve_dd_ff(const char* sensorcode, char* dd, char* ff)
 /*****************************************************************************/
 /*                                                                           */
 /*                            Bepaal_Diepte                                  */
-/*                  (NB in gps_main.c staat ook zo'n function)               */
 /*                                                                           */
 /*****************************************************************************/
 int Bepaal_Diepte(const char* sensorcode, float* DPT)
