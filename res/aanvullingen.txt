@@ -1,0 +1,32 @@
+/* 07-11-2005  extra checks op aantal meetpunten en suspect stations toegevoegd                                       */
+/* 08-11-2005  totale lds aanvulling met lfr toegevoegd                                                               */
+/* 17-03-2006  volledig_path alleen bij windows nodig function: Check_Alternatieve_dd_ff() en Bepaal_Suspect_Station()*/
+/*             Read_SOVF81_Write_CID_LFD() en Read_SOVF82_Write_CDS_LDS_DSP()                                         */
+
+
+10-01-2006 - bij sov82 extra checks voor wegschrijven naar DSP, CDS en LDS file
+             dit i.v.m. foute weergave van foutieve ANA1 data
+             nu extra checks op aantal_meetwaarden, HM0, HE1, HE2, HE3 (< 20 meter) [file: spectra_sov82_input.c]
+           - format specifier aangepast voor LFR data in LDS inlezen (bv %7.7s i.p.v %7s) [file: spectra_sov82_input.c]
+08-12-2006 - check voor schrijven naar LDS file wat veranderd omdat na GH_C label als er stond N dit dan weinig gevolgen
+             had De initialisatie 1-d spectrum bleef 0 maar richtingen wel aanwezig, NEDWAM had hier waarschijnlijk
+             moeite mee. Daarom gehele spectrum van SOVF82 afkeuren als er een N na GH_C label staat
+             if ( (atoi(HM0_lds) > 0) && (Czz5_ok == 1) && (Czz10_ok == 1) ) [file: spectra_sovf82_input.c]
+
+
+------------------------------------------- versie 1.1 (onderstaande is daarin verwerkt) -------------------------------
+02-01-2006 - ook bij lfr (sovf80) net als bij LDS (zie hierboven) Czz5_ok en Czz10_ok ingevoerd
+             [file: spectra_sovf80_input.c]
+
+
+------------------------------------------- versie 1.2 (onderstaande is daarin verwerkt) -------------------------------
+24-05-2007 - file sov82_input.c gewijzigd zodat nu 2 extra soorten files aangemaakt worden
+                      - dsp2: zelfde als dsp echter nu voor elke regel sensor + datum tijd i.p.v. alleen apart per blok
+                      - lds2: zelfde als lds echter zonder regelovergang (alles op 1 regel) en wordt ook nooit aangevuld met data uit lfr
+                  files worden in zelfde dir gezet als dsp en lds ze heten echter lds2, dsp2 (in file naam)
+             Dit alles op verzoek Frits Koek voor opslag in database
+
+ ------------------------------------------- versie 1.3 (onderstaande is daarin verwerkt) -------------------------------
+15-03-2010 - stations Q11, Q12, A122 en BG2b toegevoegd, wel moeten de ff reductiefactoren nog nauwkeuriger er ingezet
+             worden
+22-03-2010 - station A121 toegevoegd             
